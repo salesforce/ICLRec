@@ -71,14 +71,14 @@ def main():
     )
     parser.add_argument(
         "--contrast_type",
-        default="InstanceCL",
+        default="Hybrid",
         type=str,
         help="Ways to contrastive of. \
                         Support InstanceCL and ShortInterestCL, IntentCL, and Hybrid types.",
     )
     parser.add_argument(
         "--num_intent_clusters",
-        default="64",
+        default="256",
         type=str,
         help="Number of cluster of intents. Activated only when using \
                         IntentCL or Hybrid types.",
@@ -120,7 +120,7 @@ def main():
     parser.add_argument("--seed", default=1, type=int)
     parser.add_argument("--cf_weight", type=float, default=0.1, help="weight of contrastive learning task")
     parser.add_argument("--rec_weight", type=float, default=1.0, help="weight of contrastive learning task")
-    parser.add_argument("--intent_cf_weight", type=float, default=0.1, help="weight of contrastive learning task")
+    parser.add_argument("--intent_cf_weight", type=float, default=0.5, help="weight of contrastive learning task")
 
     # learning related
     parser.add_argument("--weight_decay", type=float, default=0.0, help="weight_decay of adam")
