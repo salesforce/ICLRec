@@ -321,14 +321,3 @@ if __name__ == "__main__":
         print("cf_batch:", cf_batch)
         if i > 2:
             break
-#     print("----- sasrec ------")
-#     train_dataset = SASRecDataset(args, user_seq, data_type='train')
-#     train_sampler = RandomSampler(train_dataset)
-#     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=1)
-#     rec_cf_data_iter = tqdm(enumerate(train_dataloader), total=len(train_dataloader))
-
-#     for i, rec_batch in rec_cf_data_iter:
-#         for j in range(len(rec_batch)):
-#             print("tensor ", j,rec_batch[j])
-#         if i >2:
-#             break

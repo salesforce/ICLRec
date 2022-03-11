@@ -77,12 +77,7 @@ class Trainer:
         print("Total Parameters:", sum([p.nelement() for p in self.model.parameters()]))
 
         self.cf_criterion = NCELoss(self.args.temperature, self.device)
-        # self.cf_criterion = NTXent()
-        # self.cf_criterion = SupConLoss(self.args.temperature, self.device)
         self.pcl_criterion = PCLoss(self.args.temperature, self.device)
-        # self.cf_criterion = NTXent()
-        print("self.cf_criterion:", self.cf_criterion.__class__.__name__)
-        print("self.pcl_criterion:", self.pcl_criterion.__class__.__name__)
 
     def train(self, epoch):
         self.iteration(epoch, self.train_dataloader, self.cluster_dataloader)
@@ -212,11 +207,6 @@ class ICLRecTrainer(Trainer):
         cl_batch = torch.cat(inputs, dim=0)
         cl_batch = cl_batch.to(self.device)
         cl_sequence_output = self.model(cl_batch)
-        # cl_sequence_output = cl_sequence_output.view(n_views,
-        #                                             bsz,
-        #                                             seq_len,
-        #                                             -1)
-        # cl_sequence_output = cl_sequence_output.permute(1, 0, 2, 3)
         if self.args.seq_representation_type == "mean":
             cl_sequence_output = torch.mean(cl_sequence_output, dim=1, keepdim=False)
         cl_sequence_flatten = cl_sequence_output.view(cl_batch.shape[0], -1)
@@ -296,12 +286,6 @@ class ICLRecTrainer(Trainer):
                             cl_batch, intent_ids=seq_class_label_batches
                         )
                         cl_losses.append(self.args.cf_weight * cl_loss)
-                    # not activated
-                    elif self.args.contrast_type == "ShortInterestCL":
-                        cl_loss = self._instance_cl_one_pair_contrastive_learning(
-                            cl_batch, intent_ids=seq_class_label_batches
-                        )
-                        cl_losses.append(self.args.cf_weight * cl_loss)
                     elif self.args.contrast_type == "IntentCL":
                         # ------ performing clustering for getting users' intentions ----#
                         # average sum
@@ -331,17 +315,10 @@ class ICLRecTrainer(Trainer):
                             )
                             cl_losses.append(self.args.cf_weight * cl_loss1)
                         else:
-                            # 1 actually combine short interests
                             cl_loss1 = self._instance_cl_one_pair_contrastive_learning(
                                 cl_batch, intent_ids=seq_class_label_batches
                             )
                             cl_losses.append(self.args.cf_weight * cl_loss1)
-                            # 2
-                            # cl_loss2 = self._one_pair_contrastive_learning(cl_batch, \
-                            #                         intent_classes=seq_class_label_batches)
-                            # cl_losses.append(cl_loss2)
-                            # 3
-                            # average sum
                             if self.args.seq_representation_type == "mean":
                                 sequence_output = torch.mean(sequence_output, dim=1, keepdim=False)
                             sequence_output = sequence_output.view(sequence_output.shape[0], -1)
@@ -368,7 +345,6 @@ class ICLRecTrainer(Trainer):
                 rec_avg_loss += rec_loss.item()
 
                 for i, cl_loss in enumerate(cl_losses):
-                    #                     cl_individual_avg_losses[i] += cl_loss.item()
                     cl_sum_avg_loss += cl_loss.item()
                 joint_avg_loss += joint_loss.item()
 
@@ -377,9 +353,6 @@ class ICLRecTrainer(Trainer):
                 "rec_avg_loss": "{:.4f}".format(rec_avg_loss / len(rec_cf_data_iter)),
                 "joint_avg_loss": "{:.4f}".format(joint_avg_loss / len(rec_cf_data_iter)),
             }
-            #             for i, cl_individual_avg_loss in enumerate(cl_individual_avg_losses):
-            #                 post_fix['cl_pair_'+str(i)+'_loss'] = '{:.4f}'.format(cl_individual_avg_loss / len(rec_cf_data_iter))
-
             if (epoch + 1) % self.args.log_freq == 0:
                 print(str(post_fix))
 
@@ -411,11 +384,8 @@ class ICLRecTrainer(Trainer):
                     # reference: https://stackoverflow.com/a/23734295, https://stackoverflow.com/a/20104162
                     # argpartition T: O(n)  argsort O(nlogn)
                     ind = np.argpartition(rating_pred, -20)[:, -20:]
-                    # 根据返回的下标 从对应维度分别取对应的值 得到每行topk的子表
                     arr_ind = rating_pred[np.arange(len(rating_pred))[:, None], ind]
-                    # 对子表进行排序 得到从大到小的顺序
                     arr_ind_argsort = np.argsort(arr_ind)[np.arange(len(rating_pred)), ::-1]
-                    # 再取一次 从ind中取回 原来的下标
                     batch_pred_list = ind[np.arange(len(rating_pred))[:, None], arr_ind_argsort]
 
                     if i == 0:
@@ -428,7 +398,6 @@ class ICLRecTrainer(Trainer):
 
             else:
                 for i, batch in rec_data_iter:
-                    # 0. batch_data will be sent into the device(GPU or cpu)
                     batch = tuple(t.to(self.device) for t in batch)
                     user_ids, input_ids, target_pos, target_neg, answers, sample_negs = batch
                     recommend_output = self.model.finetune(input_ids)
