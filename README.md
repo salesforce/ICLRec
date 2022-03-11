@@ -7,7 +7,7 @@ Motivation:
 
 Users' interactions with items are driven by various underlying intents. These intents are potentially beneficial to learn a better users' preferences toward massive item set.
 
-<img src="./img/motivatioin_sports.png" width="800">
+<img src="./img/motivation_sports.png" width="800">
 
 Model Architecture:
 
