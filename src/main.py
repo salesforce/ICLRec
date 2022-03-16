@@ -30,7 +30,7 @@ def show_args_info(args):
 def main():
     parser = argparse.ArgumentParser()
     # system args
-    parser.add_argument("--data_dir", default="../../../data/", type=str)
+    parser.add_argument("--data_dir", default="../data/", type=str)
     parser.add_argument("--output_dir", default="output/", type=str)
     parser.add_argument("--data_name", default="Sports_and_Outdoors", type=str)
     parser.add_argument("--do_eval", action="store_true")
@@ -97,7 +97,7 @@ def main():
         help="operate of item representation overtime. Support types: \
                         mean, concatenate",
     )
-    parser.add_argument("--warm_up_epoches", type=float, default=300, help="number of epochs to start IntentCL.")
+    parser.add_argument("--warm_up_epoches", type=float, default=0, help="number of epochs to start IntentCL.")
     parser.add_argument("--de_noise", action="store_true", help="whether to de-false negative pairs during learning.")
 
     # model args
@@ -120,7 +120,7 @@ def main():
     parser.add_argument("--seed", default=1, type=int)
     parser.add_argument("--cf_weight", type=float, default=0.1, help="weight of contrastive learning task")
     parser.add_argument("--rec_weight", type=float, default=1.0, help="weight of contrastive learning task")
-    parser.add_argument("--intent_cf_weight", type=float, default=0.5, help="weight of contrastive learning task")
+    parser.add_argument("--intent_cf_weight", type=float, default=0.3, help="weight of contrastive learning task")
 
     # learning related
     parser.add_argument("--weight_decay", type=float, default=0.0, help="weight_decay of adam")
